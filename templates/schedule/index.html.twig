@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Schedule index{% endblock %}
+
+{% block body %}
+    <h1>Schedule index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Username</th>
+                <th>PhoneNumber</th>
+                <th>Boat type</th>
+                <th>Lunch type</th>
+                <th>From - to</th>
+
+
+            </tr>
+        </thead>
+        <tbody>
+        {% for schedule in schedules %}
+            <tr>
+                <td>{{ schedule.id }}</td>
+                <td>{{ schedule.username }}</td>
+                <td>{{ schedule.phoneNumber }}</td>
+                <td>{{ schedule.boat.type }}</td>
+                <td>{{ schedule.lunch.type }}</td>
+                <td>{{ schedule.timeSlot.period }}</td>
+
+
+
+                <td>
+                    <a href="{{ path('schedule_show', {'id': schedule.id}) }}">show</a>
+                    <a href="{{ path('schedule_edit', {'id': schedule.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('schedule_new') }}">Create new</a>
+{% endblock %}
