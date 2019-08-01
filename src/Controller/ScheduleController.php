@@ -2,93 +2,121 @@
 
 namespace App\Controller;
 
+use App\Entity\Boat;
+use App\Entity\Lunch;
 use App\Entity\Schedule;
 use App\Entity\TimeSlot;
-use App\Form\ScheduleType;
-use App\Repository\ScheduleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * @Route("/schedule")
- */
 class ScheduleController extends AbstractController
 {
     /**
-     * @Route("/", name="schedule_index", methods={"GET"})
+     * @Route("/", name="schedule")
      */
-    public function index(ScheduleRepository $scheduleRepository): Response
+    public function index(Request $request)
     {
-        return $this->render('schedule/index.html.twig', [
-            'schedules' => $scheduleRepository->findAll(),
-        ]);
-    }
-
-    /**
-     * @Route("/new", name="schedule_new", methods={"GET","POST"})
-     */
-    public function new(Request $request): Response
-    {
-        $schedule = new Schedule();
-        $form = $this->createForm(ScheduleType::class, $schedule);
-        $form->handleRequest($request);
         $entityManager = $this->getDoctrine()->getManager();
-        if ($form->isSubmitted() && $form->isValid()) {
 
-            $entityManager->persist($schedule);
-            $entityManager->flush();
-            return $this->redirectToRoute('schedule_index');
+        $ts = $entityManager->getRepository(TimeSlot::class)->findAll();
+        $boats = $entityManager->getRepository(Boat::class)->findAll();
+        $lunches = $entityManager->getRepository(Lunch::class)->findAll();
+        $schedules= $entityManager->getRepository(Schedule::class)->findAll();
+        $allSchedules = $entityManager->getRepository(Schedule::class)->findAll();
+
+        if (isset( $_POST['send']) )
+        {
+            if (!empty($_POST['username']) && !empty($_POST['email']) && !empty($_POST['phone']))
+            {
+                if (is_numeric($_POST['phone']))
+                {
+
+                    foreach ($schedules as $sch)
+                    {
+                        if ($sch->getPhoneNumber() != $_POST['phone'])
+                        {
+                            $phone = $_POST['phone'];
+
+                        }
+                        else {
+                            $phone= "";
+                            break;
+                        }
+                    }
+                    if (!empty($phone))
+                    {
+                        $boat = $entityManager->getRepository(Boat::class)->findOneBy(['type' => $_POST['boat']]);
+                        $lunch = $entityManager->getRepository(Lunch::class)->findOneBy(['type' => $_POST['lunch']]);
+                        $timeSlot = $entityManager->getRepository(TimeSlot::class)->findOneBy(['period'  => $_POST['timeSlot']]);
+                        $schedule = new Schedule($_POST['username'],$_POST['email'],$phone,$boat,$lunch,$timeSlot);
+                        $entityManager->persist($schedule);
+                        $entityManager->flush();
+
+                        return $this->render('schedule/show.html.twig',
+                            [
+                                'schedule' => $schedule,
+                                'allSchedules' => $allSchedules
+                            ]
+                        );
+                    }
+                    else
+                    {
+                        echo "This phone already exist in our schedules!";
+                    }
+                    }
+
+
+                else
+                {
+                    echo "Phone number must be numeric!";
+
+                }
+            }
+            else
+            {
+                echo "You have to fill in every field!!!";
+            }
+
         }
 
-        return $this->render('schedule/new.html.twig', [
-            'schedule' => $schedule,
-            'form' => $form->createView(),
+
+
+
+        return $this->render('schedule/index.html.twig', [
+            'timeSlots' => $ts,
+            'schedules' =>  $schedules,
+            'boats' => $boats,
+            'lunches' => $lunches
         ]);
     }
 
     /**
-     * @Route("/{id}", name="schedule_show", methods={"GET"})
+     * @Route("/showall", name="showall")
      */
-    public function show(Schedule $schedule): Response
+    public function showall()
     {
-        return $this->render('schedule/show.html.twig', [
-            'schedule' => $schedule,
-        ]);
+        $entityManager = $this->getDoctrine()->getManager();
+        $allSchedules = $entityManager->getRepository(Schedule::class)->findAll();
+
+
+        return $this->render('schedule/show.html.twig',
+            [
+                'allSchedules' => $allSchedules
+            ]
+        );
     }
 
     /**
-     * @Route("/{id}/edit", name="schedule_edit", methods={"GET","POST"})
+     * @Route("/delete/{id}", name="delete")
      */
-    public function edit(Request $request, Schedule $schedule): Response
+    public function delete(Request $request,Schedule $schedule)
     {
-        $form = $this->createForm(ScheduleType::class, $schedule);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('schedule_index');
-        }
-
-        return $this->render('schedule/edit.html.twig', [
-            'schedule' => $schedule,
-            'form' => $form->createView(),
-        ]);
-    }
-
-    /**
-     * @Route("/{id}", name="schedule_delete", methods={"DELETE"})
-     */
-    public function delete(Request $request, Schedule $schedule): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$schedule->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($schedule);
             $entityManager->flush();
-        }
 
-        return $this->redirectToRoute('schedule_index');
+
+        return $this->redirectToRoute('showall');
     }
 }

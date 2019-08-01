@@ -5,29 +5,50 @@
 {% block body %}
     <h1>Schedule</h1>
 
+    {% for schedule in allSchedules %}
+
     <table class="table">
         <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ schedule.id }}</td>
-            </tr>
-            <tr>
-                <th>Username</th>
-                <td>{{ schedule.username }}</td>
-            </tr>
+        <tr>
+            <th>Id</th>
+            <td>{{ schedule.id }}</td>
+        </tr>
+        <tr>
+            <th>Username</th>
+            <td>{{ schedule.username }}</td>
+        </tr>
 
 
-            <tr>
-                <th>PhoneNumber</th>
-                <td>{{ schedule.phoneNumber }}</td>
-            </tr>
+        <tr>
+            <th>PhoneNumber</th>
+            <td>{{ schedule.phoneNumber }}</td>
+        </tr>
+
+        <tr>
+            <th>Email</th>
+            <td>{{ schedule.email }}</td>
+        </tr>
+
+        <tr>
+            <th>Boat size</th>
+            <td>{{ schedule.boat.type }}</td>
+        </tr>
+
+        <tr>
+            <th>Lunch type</th>
+            <td>{{ schedule.lunch.type }}</td>
+        </tr>
+
+        <tr>
+            <th>Time</th>
+            <td>{{ schedule.timeSlot.period }}</td>
+        </tr>
 
         </tbody>
     </table>
+        <a href="{{ path('delete', {'id': schedule.id}) }}">Delete</a>
 
-    <a href="{{ path('schedule_index') }}">back to list</a>
+    {% endfor %}
+    <a href="{{ path('schedule')}}">Add new</a>
 
-    <a href="{{ path('schedule_edit', {'id': schedule.id}) }}">edit</a>
-
-    {{ include('schedule/_delete_form.html.twig') }}
 {% endblock %}

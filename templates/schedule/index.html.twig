@@ -1,47 +1,47 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Schedule index{% endblock %}
+{% block title %}Hello ScheduleController!{% endblock %}
 
 {% block body %}
-    <h1>Schedule index</h1>
+    <form method="post" action="/">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Username</th>
-                <th>PhoneNumber</th>
-                <th>Boat type</th>
-                <th>Lunch type</th>
-                <th>From - to</th>
+        <label>Name</label> <br>
+        <input type="text" name="username"> <br>
 
+        <label>Email</label> <br>
+        <input type="text" name="email"> <br>
 
-            </tr>
-        </thead>
-        <tbody>
-        {% for schedule in schedules %}
-            <tr>
-                <td>{{ schedule.id }}</td>
-                <td>{{ schedule.username }}</td>
-                <td>{{ schedule.phoneNumber }}</td>
-                <td>{{ schedule.boat.type }}</td>
-                <td>{{ schedule.lunch.type }}</td>
-                <td>{{ schedule.timeSlot.period }}</td>
+        <label>Phone number</label> <br>
+        <input type="text" name="phone"> <br>
 
+        <label>Boat</label> <br>
+        <select name="boat">
 
+            {% for boat in boats %}
 
-                <td>
-                    <a href="{{ path('schedule_show', {'id': schedule.id}) }}">show</a>
-                    <a href="{{ path('schedule_edit', {'id': schedule.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                <option value="{{ boat.type }}">{{ boat.type }}</option>
 
-    <a href="{{ path('schedule_new') }}">Create new</a>
+            {% endfor %}
+        </select> <br>
+
+        <label>Lunch</label> <br>
+        <select name="lunch">
+
+            {% for lunch in lunches %}
+
+                <option value="{{ lunch.type }}">{{ lunch.type }}</option>
+
+            {% endfor %}
+        </select> <br>
+
+        <label>Periods</label> <br>
+
+        {% for timeSlot in timeSlots %}
+            <input type="radio" name="timeSlot" value="{{ timeSlot.period }}">
+            <label>{{ timeSlot.period }} (/{{ timeSlot.capacity }})</label>
+
+        {% endfor %} <br>
+
+        <input type="submit" name="send" name="send">
+    </form>
 {% endblock %}

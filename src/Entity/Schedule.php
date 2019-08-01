@@ -21,6 +21,11 @@ class Schedule
      */
     private $username;
 
+    /**
+     * @ORM\Column(type="string", length=30)
+     */
+    private $email;
+
 
     /**
      * @ORM\Column(type="string", length=25)
@@ -46,6 +51,17 @@ class Schedule
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    public function setEmail($email)
+    {
+       $this->email = $email;
+       return $this;
     }
 
     public function getUsername(): ?string
@@ -107,5 +123,14 @@ class Schedule
         $this->lunch = $lunch;
 
         return $this;
+    }
+    public function __construct($username , $email , $phone ,Boat $boat ,Lunch $lunch ,TimeSlot $timeSlot)
+    {
+        $this->setUsername($username);
+        $this->setEmail($email);
+        $this->setPhoneNumber($phone);
+        $this->setBoat($boat);
+        $this->setLunch($lunch);
+        $this->setTimeSlot($timeSlot);
     }
 }
